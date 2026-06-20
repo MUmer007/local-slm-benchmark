@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phi-3 Enterprise Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --bg:#0b1020;
+    --bg-secondary:#121826;
+    --card:#151c2f;
+    --border:#2a3553;
+    --text:#ffffff;
+    --text-secondary:#94a3b8;
+    --primary:#4f46e5;
+    --primary-hover:#6366f1;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --glass:rgba(255,255,255,0.03);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Inter',sans-serif;
+    background:linear-gradient(
+        135deg,
+        #0b1020,
+        #10182f,
+        #0b1020
+    );
+    color:var(--text);
+    min-height:100vh;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* Sidebar */
+
+.sidebar{
+    width:260px;
+    background:rgba(8,12,25,0.8);
+    backdrop-filter:blur(16px);
+    border-right:1px solid var(--border);
+    padding:24px;
+}
+
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:40px;
+}
+
+.logo-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        #7c3aed
+    );
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+}
+
+.logo h2{
+    font-size:18px;
+}
+
+.logo span{
+    color:var(--text-secondary);
+    font-size:12px;
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.nav-item{
+    padding:14px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:0.25s;
+    color:var(--text-secondary);
+}
+
+.nav-item:hover,
+.nav-item.active{
+    background:var(--glass);
+    color:white;
+}
+
+.status-card{
+    margin-top:30px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px;
+}
+
+.status-title{
+    font-size:13px;
+    color:var(--text-secondary);
+    margin-bottom:10px;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:var(--success);
+    box-shadow:0 0 12px var(--success);
+}
+
+/* Main */
+
+.main{
+    flex:1;
+    padding:40px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.header h1{
+    font-size:30px;
+}
+
+.header p{
+    color:var(--text-secondary);
+    margin-top:5px;
+}
+
+.analytics{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:18px;
+    margin-bottom:25px;
+}
+
+.metric{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px;
+}
+
+.metric-label{
+    color:var(--text-secondary);
+    font-size:13px;
+}
+
+.metric-value{
+    margin-top:8px;
+    font-size:28px;
+    font-weight:700;
+}
+
+.workspace{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    overflow:hidden;
+}
+
+.workspace-header{
+    padding:20px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.workspace-body{
+    padding:24px;
+}
+
+textarea{
+    width:100%;
+    min-height:180px;
+    resize:vertical;
+    background:#0f172a;
+    color:white;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+    font-size:15px;
+    outline:none;
+}
+
+.controls{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:18px;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.left-controls{
+    display:flex;
+    gap:12px;
+}
+
+select{
+    background:#0f172a;
+    color:white;
+    border:1px solid var(--border);
+    padding:12px 16px;
+    border-radius:12px;
+}
+
+button{
+    border:none;
+    cursor:pointer;
+    transition:0.25s;
+}
+
+.run-btn{
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        #7c3aed
+    );
+    color:white;
+    padding:14px 24px;
+    border-radius:12px;
+    font-weight:600;
+}
+
+.run-btn:hover{
+    transform:translateY(-2px);
+}
+
+.run-btn:disabled{
+    opacity:0.6;
+}
+
+.result-section{
+    margin-top:24px;
+    display:none;
+}
+
+.result-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:24px;
+}
+
+.result-toolbar{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:18px;
+}
+
+.copy-btn{
+    background:#1e293b;
+    color:white;
+    padding:10px 16px;
+    border-radius:10px;
+}
+
+.response{
+    line-height:1.8;
+    white-space:pre-wrap;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:20px;
+}
+
+.stat{
+    background:#0f172a;
+    border:1px solid var(--border);
+    padding:16px;
+    border-radius:12px;
+}
+
+.stat-title{
+    color:var(--text-secondary);
+    font-size:12px;
+}
+
+.stat-value{
+    margin-top:6px;
+    font-weight:700;
+    font-size:18px;
+}
+
+.loader{
+    display:none;
+    text-align:center;
+    padding:25px;
+    color:var(--text-secondary);
+}
+
+.spinner{
+    width:30px;
+    height:30px;
+    border:3px solid rgba(255,255,255,0.2);
+    border-top-color:white;
+    border-radius:50%;
+    margin:auto;
+    animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@media(max-width:900px){
+
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+        padding:20px;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">Φ</div>
+            <div>
+                <h2>Phi-3 AI</h2>
+                <span>Enterprise Edition</span>
+            </div>
+        </div>
+
+        <div class="nav">
+            <div class="nav-item active">Inference Dashboard</div>
+            <div class="nav-item">Model Analytics</div>
+            <div class="nav-item">Logs</div>
+            <div class="nav-item">Monitoring</div>
+            <div class="nav-item">Settings</div>
+        </div>
+
+        <div class="status-card">
+            <div class="status-title">Model Status</div>
+            <div class="status">
+                <div class="dot"></div>
+                <span>Phi-3 Running Locally</span>
+            </div>
+        </div>
+
+    </aside>
+
+    <main class="main">
+
+        <div class="header">
+            <div>
+                <h1>Local AI Inference</h1>
+                <p>100% Offline • Powered by Ollama • No Cloud Dependency</p>
+            </div>
+        </div>
+
+        <div class="analytics">
+
+            <div class="metric">
+                <div class="metric-label">Model</div>
+                <div class="metric-value">Phi-3</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-label">Inference Mode</div>
+                <div class="metric-value">Local</div>
+            </div>
+
+            <div class="metric">
+                <div class="metric-label">Security</div>
+                <div class="metric-value">Private</div>
+            </div>
+
+        </div>
+
+        <div class="workspace">
+
+            <div class="workspace-header">
+                <h3>Prompt Workspace</h3>
+                <small style="color:#94a3b8">
+                    Ctrl + Enter to Run
+                </small>
+            </div>
+
+            <div class="workspace-body">
+
+                <textarea id="promptInput" placeholder="Enter your prompt here..."></textarea>
+
+                <div class="controls">
+
+                    <div class="left-controls">
+
+                        <select id="tempSelect">
+                            <option value="0.2">Deterministic (0.2)</option>
+                            <option value="0.5">Balanced (0.5)</option>
+                            <option value="0.8">Creative (0.8)</option>
+                        </select>
+
+                    </div>
+
+                    <button
+                        id="submitBtn"
+                        class="run-btn"
+                        onclick="runInference()">
+                        Run Inference
+                    </button>
+
+                </div>
+
+                <div class="loader" id="loading">
+                    <div class="spinner"></div>
+                    <div style="margin-top:12px">
+                        Generating response...
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="result-section" id="resultSection">
+
+            <div class="result-card">
+
+                <div class="result-toolbar">
+                    <h3>Model Response</h3>
+                    <button class="copy-btn" onclick="copyResponse()">
+                        Copy
+                    </button>
+                </div>
+
+                <div class="response" id="responseText"></div>
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <div class="stat-title">Latency</div>
+                        <div class="stat-value" id="latency">-</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-title">Tokens</div>
+                        <div class="stat-value" id="tokens">-</div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-title">Throughput</div>
+                        <div class="stat-value" id="speed">-</div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+
+async function runInference() {
+
+    const prompt =
+        document.getElementById('promptInput').value;
+
+    if(!prompt.trim()) return;
+
+    const btn =
+        document.getElementById('submitBtn');
+
+    const loading =
+        document.getElementById('loading');
+
+    btn.disabled = true;
+    loading.style.display = 'block';
+
+    try{
+
+        const response = await fetch('/infer',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({
+                prompt:prompt,
+                temperature:parseFloat(
+                    document.getElementById('tempSelect').value
+                )
+            })
+        });
+
+        const data = await response.json();
+
+        document.getElementById(
+            'resultSection'
+        ).style.display='block';
+
+        document.getElementById(
+            'responseText'
+        ).textContent=data.response;
+
+        document.getElementById(
+            'latency'
+        ).textContent=data.latency_s + ' s';
+
+        document.getElementById(
+            'tokens'
+        ).textContent=data.tokens;
+
+        document.getElementById(
+            'speed'
+        ).textContent=data.tokens_per_sec + ' tok/s';
+
+    }
+    catch(err){
+
+        document.getElementById(
+            'resultSection'
+        ).style.display='block';
+
+        document.getElementById(
+            'responseText'
+        ).textContent='Error: ' + err.message;
+
+    }
+    finally{
+
+        btn.disabled = false;
+        loading.style.display='none';
+
+    }
+
+}
+
+function copyResponse(){
+
+    navigator.clipboard.writeText(
+        document.getElementById(
+            'responseText'
+        ).innerText
+    );
+
+}
+
+document.getElementById('promptInput')
+.addEventListener('keydown',function(e){
+
+    if(e.ctrlKey && e.key === 'Enter'){
+        runInference();
+    }
+
+});
+
+</script>
+
+</body>
+</html>

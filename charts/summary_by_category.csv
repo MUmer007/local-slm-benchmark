@@ -1,0 +1,6 @@
+category,avg_latency_s,avg_tokens_per_sec,min_latency_s,max_latency_s,total_runs
+code,234.27,2.88,22.11,1191.86,12
+creative,57.71,2.9,13.81,82.53,12
+factual,119.33,3.71,17.01,295.47,12
+reasoning,119.25,3.17,36.77,222.06,12
+summarize,53.49,3.17,39.66,73.0,12
